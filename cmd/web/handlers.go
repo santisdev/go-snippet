@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"text/template"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -12,7 +14,18 @@ func home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("Hello from Snippetbox"))
+	ts, err := template.ParseFiles("./ui/html/pages/home.tmpl")
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+
+	err = ts.Execute(w, nil) //second parameter represents any dynamic data
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
 }
 
 func snippetView(w http.ResponseWriter, r *http.Request) {
